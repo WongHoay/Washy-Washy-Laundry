@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:washywashy_laundry/sign_in.dart';
 
 class UserProfilePage extends StatelessWidget {
   const UserProfilePage({super.key});
@@ -128,6 +129,10 @@ class UserProfilePage extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       // Handle logout
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SignInPage()),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFF9292),
