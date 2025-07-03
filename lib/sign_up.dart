@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:washywashy_laundry/sign_in.dart';
-
 
 class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
@@ -42,7 +43,6 @@ class SignUpPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // Name field
               _buildInputField(
                 iconPath: 'assets/imgname.png',
                 hintText: 'Name',
@@ -50,7 +50,6 @@ class SignUpPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // Email field
               _buildInputField(
                 iconPath: 'assets/imgemail.png',
                 hintText: 'Email',
@@ -59,7 +58,6 @@ class SignUpPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // Password field
               _buildInputField(
                 iconPath: 'assets/imgpassword.png',
                 hintText: 'Must be 6 character',
@@ -68,7 +66,6 @@ class SignUpPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // Confirm password field
               _buildInputField(
                 iconPath: 'assets/imgpassword.png',
                 hintText: 'Confirm Password',
@@ -77,12 +74,70 @@ class SignUpPage extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
-              // Register button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Handle register
+                  onPressed: () async {
+                    final name = nameController.text.trim();
+                    final email = emailController.text.trim();
+                    final password = passwordController.text.trim();
+                    final confirmPassword = confirmPasswordController.text.trim();
+
+                    if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please fill in all fields.')),
+                      );
+                      return;
+                    }
+
+                    if (password != confirmPassword) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Passwords do not match.')),
+                      );
+                      return;
+                    }
+
+                    try {
+                      final auth = FirebaseAuth.instance;
+                      final result = await auth.createUserWithEmailAndPassword(
+                        email: email,
+                        password: password,
+                      );
+
+                      final user = result.user;
+                      if (user != null) {
+                        await user.updateDisplayName(name);
+
+                        final dbRef = FirebaseDatabase.instance.ref().child('Users').child(user.uid);
+                        await dbRef.set({
+                          'name': name,
+                          'email': email,
+                          'role': 'User',
+                        });
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Registration successful!')),
+                        );
+
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const SignInPage()),
+                        );
+                      }
+                    } on FirebaseAuthException catch (e) {
+                      String message = 'An error occurred. Please try again.';
+                      if (e.code == 'email-already-in-use') {
+                        message = 'This email is already in use.';
+                      } else if (e.code == 'weak-password') {
+                        message = 'Password is too weak.';
+                      } else if (e.code == 'invalid-email') {
+                        message = 'Invalid email address.';
+                      }
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(message)),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF6E9BB5),
@@ -101,7 +156,6 @@ class SignUpPage extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // Sign In prompt
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -111,7 +165,6 @@ class SignUpPage extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      // Navigate to sign-in page
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const SignInPage()),
@@ -129,17 +182,6 @@ class SignUpPage extends StatelessWidget {
                 ],
               ),
 
-              // Progress Bar placeholder (visible when needed)
-              const Center(
-                child: SizedBox(
-                  height: 30,
-                  width: 30,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 3,
-                    color: Color(0xFF6E9BB5),
-                  ),
-                ),
-              ),
               const SizedBox(height: 20),
             ],
           ),
@@ -171,7 +213,7 @@ class SignUpPage extends StatelessWidget {
               color: Color(0xFF6E9BB5),
               shape: BoxShape.rectangle,
             ),
-            child: Image.asset(iconPath), // Make sure the path is correct
+            child: Image.asset(iconPath),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -190,3 +232,4 @@ class SignUpPage extends StatelessWidget {
     );
   }
 }
+

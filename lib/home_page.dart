@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:washywashy_laundry/dry_page.dart';
+import 'package:washywashy_laundry/wash_page.dart';
+import 'package:washywashy_laundry/washdry_page.dart';
+import 'package:washywashy_laundry/washdryfold_page.dart';
+import 'package:washywashy_laundry/cart_page.dart';
+import 'package:washywashy_laundry/userprofile.dart';
+import 'package:washywashy_laundry/userhistory_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -7,17 +14,38 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
+      // Bottom Navigation Bar
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
+        unselectedItemColor: Color(0xFF3C3F43),
+        currentIndex: 0,
+        onTap: (index) {
+          switch (index) {
+            case 0:
+            // Already in Home
+              break;
+            case 1:
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage()));
+              break;
+            case 2:
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const UserCartPage()));
+              break;
+            case 3:
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const UserHistoryPage()));
+              break;
+          }
+        },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
           BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: "Cart"),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: "History"),
         ],
       ),
+
+      // Body Content
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(10),
@@ -43,13 +71,32 @@ class HomePage extends StatelessWidget {
                 spacing: 15,
                 runSpacing: 15,
                 children: [
-                  _buildServiceCard(imagePath: 'assets/imgwashdry.png', title: 'Wash + Dry'),
-                  _buildServiceCard(imagePath: 'assets/imgfold.png', title: 'Wash + Dry + Fold'),
-                  _buildServiceCard(imagePath: 'assets/imgwash.png', title: 'Wash'),
-                  _buildServiceCard(imagePath: 'assets/imgdry.png', title: 'Dry'),
+                  _buildServiceCard(
+                    context: context,
+                    imagePath: 'assets/imgwashdry.png',
+                    title: 'Wash + Dry',
+                    page: const WashDryPage(),
+                  ),
+                  _buildServiceCard(
+                    context: context,
+                    imagePath: 'assets/imgfold.png',
+                    title: 'Wash + Dry + Fold',
+                    page: const WashDryFoldPage(),
+                  ),
+                  _buildServiceCard(
+                    context: context,
+                    imagePath: 'assets/imgwash.png',
+                    title: 'Wash',
+                    page: const WashPage(),
+                  ),
+                  _buildServiceCard(
+                    context: context,
+                    imagePath: 'assets/imgdry.png',
+                    title: 'Dry',
+                    page: const DryPage(),
+                  ),
                 ],
               ),
-
             ],
           ),
         ),
@@ -57,31 +104,42 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildServiceCard({required String imagePath, required String title}) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      width: 190,
-      height: 170,
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.grey.shade300, blurRadius: 5)],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Image.asset(imagePath, width: 100, height: 100),
-          const SizedBox(height: 10),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
+  Widget _buildServiceCard({
+    required BuildContext context,
+    required String imagePath,
+    required String title,
+    required Widget page,
+  }) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 10),
+        width: 190,
+        height: 170,
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [BoxShadow(color: Colors.grey.shade300, blurRadius: 5)],
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          children: [
+            Image.asset(imagePath, width: 100, height: 100),
+            const SizedBox(height: 10),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

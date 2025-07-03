@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:washywashy_laundry/sign_up.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 class SignInPage extends StatelessWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -119,9 +121,32 @@ class SignInPage extends StatelessWidget {
                     backgroundColor: const Color(0xFF6E9BB5),
                     padding: const EdgeInsets.symmetric(vertical: 15),
                   ),
-                  onPressed: () {
-                    // Handle login
+                  onPressed: () async {
+                    final email = emailController.text.trim();
+                    final password = passwordController.text.trim();
+
+                    if (email.isEmpty || password.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Please enter email and password")),
+                      );
+                      return;
+                    }
+
+                    try {
+                      final userCredential = await FirebaseAuth.instance
+                          .signInWithEmailAndPassword(email: email, password: password);
+
+                      final user = userCredential.user;
+                      if (user != null) {
+                        Navigator.pushReplacementNamed(context, '/home'); // Or any route
+                      }
+                    } on FirebaseAuthException catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(e.message ?? "Login failed")),
+                      );
+                    }
                   },
+
                   child: const Text(
                     'Login',
                     style: TextStyle(
