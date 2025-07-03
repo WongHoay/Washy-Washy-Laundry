@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "220039523089",
+    "project_id": "washywashy-laundry",
+    "storage_bucket": "washywashy-laundry.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:220039523089:android:82d6f1598f1858c2897ab0",
+        "android_client_info": {
+          "package_name": "com.example.washywashy_laundry"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-V1uIBSVK2OEHd6WKilc5GItuK4vehRM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
