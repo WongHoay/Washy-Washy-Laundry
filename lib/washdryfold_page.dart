@@ -1,24 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:washywashy_laundry/home_page.dart';
 import 'package:washywashy_laundry/payment_page.dart';
+import 'package:washywashy_laundry/userhistory_page.dart';
+import 'package:washywashy_laundry/userprofile.dart';
 
-class WashDryFoldPage extends StatelessWidget {
+import 'cart_page.dart';
+
+class WashDryFoldPage extends StatefulWidget {
   const WashDryFoldPage({super.key});
+
+  @override
+  State<WashDryFoldPage> createState() => _WashDryFoldPageState();
+}
+
+class _WashDryFoldPageState extends State<WashDryFoldPage> {
+
+  int _selectedIndex=0;
+
+  void _onItemTapped(int index) {
+    if (_selectedIndex == index) return;
+
+    setState(() => _selectedIndex = index);
+
+    switch (index) {
+      case 0:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage()));
+        break;
+      case 1:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const UserProfilePage()));
+        break;
+      case 2:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const UserCartPage()));
+        break;
+      case 3:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const UserHistoryPage()));
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFFE0F7FA),
+        backgroundColor: Colors.white,
         selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
+        unselectedItemColor: const Color(0xFF3C3F43),
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: "Cart"),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: "History"),
         ],
-        onTap: (index) {
-          // handle navigation
-        },
       ),
       body: SafeArea(
         child: SingleChildScrollView(

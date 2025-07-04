@@ -1,8 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:washywashy_laundry/userhistory_page.dart';
+import 'package:washywashy_laundry/userprofile.dart';
 import 'package:washywashy_laundry/widgets/cart_item.dart';
+import 'package:washywashy_laundry/home_page.dart';
 
-class UserCartPage extends StatelessWidget {
+class UserCartPage extends StatefulWidget {
   const UserCartPage({super.key});
+
+  @override
+  State<UserCartPage> createState() => _UserCartPageState();
+}
+
+
+class _UserCartPageState extends State<UserCartPage> {
+
+  int _selectedIndex = 2;
+
+  void _onBottomNavTapped(int index) {
+    if (_selectedIndex == index) return;
+
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 0:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage()));
+        break;
+      case 1:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const UserProfilePage()));
+        break;
+      case 2:
+      // Already on Cart
+        break;
+      case 3:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const UserHistoryPage()));
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,16 +64,16 @@ class UserCartPage extends StatelessWidget {
         backgroundColor: Colors.white,
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex,
+        onTap: _onBottomNavTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
           BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
         ],
-        currentIndex: 2,
-        onTap: (index) {
-          // Handle bottom nav actions
-        },
       ),
+
 
       body: SafeArea(
         child: SingleChildScrollView(

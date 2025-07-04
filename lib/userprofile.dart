@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:washywashy_laundry/sign_in.dart';
+import 'package:washywashy_laundry/edit_profile.dart';
 
-class UserProfilePage extends StatelessWidget {
+class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
 
+  @override
+  State<UserProfilePage> createState() => _UserProfilePageState();
+}
+
+class _UserProfilePageState extends State<UserProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -12,27 +18,28 @@ class UserProfilePage extends StatelessWidget {
         backgroundColor: const Color(0xFFE0F7FA),
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_cart),
-            label: 'Cart',
-          ),
-          BottomNavigationBarItem(
-              icon:Icon(Icons.history),
-            label: 'History',
-          ),
-        ],
+        currentIndex: 1, // Profile is index 1
         onTap: (index) {
-          // Handle navigation here
+          if (index == 1) return; // Already on profile
+
+          switch (index) {
+            case 0:
+              Navigator.pushReplacementNamed(context, '/home');
+              break;
+            case 2:
+              Navigator.pushReplacementNamed(context, '/cart');
+              break;
+            case 3:
+              Navigator.pushReplacementNamed(context, '/history');
+              break;
+          }
         },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -110,6 +117,10 @@ class UserProfilePage extends StatelessWidget {
                       TextButton(
                         onPressed: () {
                           // Navigate to edit profile
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const EditProfilePage()),
+                          );
                         },
                         child: const Text(
                           'Edit Your Profile',

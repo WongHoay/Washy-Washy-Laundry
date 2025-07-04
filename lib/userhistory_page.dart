@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:washywashy_laundry/cart_page.dart';
+import 'package:washywashy_laundry/home_page.dart';
+import 'package:washywashy_laundry/userprofile.dart';
 import 'package:washywashy_laundry/widgets/order_history_item.dart';
 
-class UserHistoryPage extends StatelessWidget {
+class UserHistoryPage extends StatefulWidget {
   const UserHistoryPage({super.key});
 
+  @override
+  State<UserHistoryPage> createState() => _UserHistoryPageState();
+}
+
+class _UserHistoryPageState extends State<UserHistoryPage> {
   // Example data (replace with Firebase or local DB)
   final List<Map<String, String>> _history = const [
     {
@@ -20,6 +28,34 @@ class UserHistoryPage extends StatelessWidget {
     },
   ];
 
+  int _selectedIndex = 3; // History index
+
+  void _onBottomNavTapped(int index) {
+    if (_selectedIndex == index) return;
+
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 0:
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (_) => const HomePage()));
+        break;
+      case 1:
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (_) => const UserProfilePage()));
+        break;
+      case 2:
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (_) => const UserCartPage()));
+        break;
+      case 3:
+      // Already on History
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,15 +65,16 @@ class UserHistoryPage extends StatelessWidget {
         backgroundColor: const Color(0xFFE0F7FA),
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex,
+        onTap: _onBottomNavTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
         ],
-        onTap: (index) {
-          // Handle bottom nav navigation here
-        },
       ),
+
 
       body: SafeArea(
         child: SingleChildScrollView(
