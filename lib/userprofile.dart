@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:washywashy_laundry/sign_in.dart';
+import 'package:washywashy_laundry/edit_profile.dart';
 
 class UserProfilePage extends StatelessWidget {
   const UserProfilePage({super.key});
@@ -110,6 +111,10 @@ class UserProfilePage extends StatelessWidget {
                       TextButton(
                         onPressed: () {
                           // Navigate to edit profile
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const EditProfilePage()),
+                          );
                         },
                         child: const Text(
                           'Edit Your Profile',
