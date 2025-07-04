@@ -4,6 +4,8 @@ import 'package:washywashy_laundry/home_page.dart';
 import 'package:washywashy_laundry/payment_page.dart';
 import 'package:washywashy_laundry/userhistory_page.dart';
 import 'package:washywashy_laundry/userprofile.dart';
+import 'package:firebase_database/firebase_database.dart';
+
 
 class DryPage extends StatefulWidget {
   const DryPage({super.key});
@@ -13,6 +15,24 @@ class DryPage extends StatefulWidget {
 }
 
 class _DryPageState extends State<DryPage> {
+
+  void addToCart() {
+    final cartRef = FirebaseDatabase.instance.ref().child('Cart');
+
+    final cartItem = {
+      'dryer': selectedDryerKg ?? 'NONE',
+      'washer': 'NONE',
+      'fold': 'NONE',
+      'total': selectedDryerPrice ?? 'RM 0.00',
+    };
+
+    cartRef.push().set(cartItem);
+  }
+
+  String? selectedDryerKg;
+  String? selectedDryerPrice;
+
+
   int _selectedIndex=0;
 
   void _onBottomNavTapped(int index) {
@@ -141,10 +161,11 @@ class _DryPageState extends State<DryPage> {
                     "Total: ",
                     style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                   ),
-                  const Text(
-                    "RM 0.00",
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                  ),
+                  Text(
+                    selectedDryerPrice ?? "RM 0.00",
+                    style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  )
+
                 ],
               ),
               const SizedBox(height: 30),
@@ -152,7 +173,15 @@ class _DryPageState extends State<DryPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Image.asset('assets/imgaddtocart.png', width: 60, height: 60),
+                  GestureDetector(
+                    onTap: () {
+                      addToCart(); // 🔥 Call the function to add selected item
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Added to Cart")),
+                      );
+                    },
+                    child: Image.asset('assets/imgaddtocart.png', width: 60, height: 60),
+                  ),
                   ElevatedButton(
                     onPressed: () {
                       // Go to checkout
@@ -180,26 +209,41 @@ class _DryPageState extends State<DryPage> {
   }
 
   Widget _buildDryMachine(String kg, String price) {
-    return Container(
-      width: 150,
-      height: 150,
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.grey.shade300, blurRadius: 5)],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset('assets/imgdrymachine.png', width: 60, height: 60),
-          const SizedBox(height: 5),
-          Text(kg,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF140435))),
-          Text(price,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFFC70A50))),
-        ],
+    bool isSelected = selectedDryerKg == kg;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedDryerKg = kg;
+          selectedDryerPrice = price;
+        });
+      },
+      child: Container(
+        width: 150,
+        height: 150,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.blue.shade100 : Colors.white,
+          boxShadow: [BoxShadow(color: Colors.grey.shade300, blurRadius: 5)],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? Colors.blue : Colors.transparent,
+            width: 2,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/imgdrymachine.png', width: 60, height: 60),
+            const SizedBox(height: 5),
+            Text(kg,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF140435))),
+            Text(price,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFFC70A50))),
+          ],
+        ),
       ),
     );
   }
+
 }

@@ -4,6 +4,8 @@ import 'package:washywashy_laundry/userprofile.dart';
 import 'package:washywashy_laundry/widgets/cart_item.dart';
 import 'package:washywashy_laundry/home_page.dart';
 
+import 'package:firebase_database/firebase_database.dart';
+
 class UserCartPage extends StatefulWidget {
   const UserCartPage({super.key});
 
@@ -15,6 +17,40 @@ class UserCartPage extends StatefulWidget {
 class _UserCartPageState extends State<UserCartPage> {
 
   int _selectedIndex = 2;
+  final List<Map<String, String>> cartItems = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCartData();
+  }
+
+  void fetchCartData() async {
+    final dbRef = FirebaseDatabase.instance.ref().child('Cart');
+    final snapshot = await dbRef.get();
+
+    if (snapshot.exists) {
+      final data = snapshot.value as Map<dynamic, dynamic>;
+      final List<Map<String, String>> loadedItems = [];
+
+      data.forEach((key, value) {
+        final item = Map<String, String>.from(value);
+        loadedItems.add(item);
+      });
+
+      setState(() {
+        cartItems.clear();
+        cartItems.addAll(loadedItems);
+        _isLoading = false;
+      });
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
 
   void _onBottomNavTapped(int index) {
     if (_selectedIndex == index) return;
@@ -41,21 +77,15 @@ class _UserCartPageState extends State<UserCartPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Example cart data — replace with Firebase or Provider data
-    final List<Map<String, String>> cartItems = [
-      {
-        'total': 'RM 10.00',
-        'washer': '15 KG',
-        'dryer': 'NONE',
-        'fold': 'NONE',
-      },
-      {
-        'total': 'RM 20.00',
-        'washer': '20 KG',
-        'dryer': '15 KG',
-        'fold': 'NONE',
-      },
-    ];
+
+    // final List<Map<String, String>> cartItems = [
+    //   {
+    //     'total': selectedDryerPrice ?? 'RM 0.00',
+    //     'washer': 'NONE',
+    //     'dryer': selectedDryerKg ?? 'NONE',
+    //     'fold': 'NONE',
+    //   },
+    // ];
 
     return Scaffold(
       backgroundColor: Colors.white,

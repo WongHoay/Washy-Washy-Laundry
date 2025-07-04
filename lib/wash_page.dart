@@ -4,6 +4,7 @@ import 'package:washywashy_laundry/home_page.dart';
 import 'package:washywashy_laundry/payment_page.dart';
 import 'package:washywashy_laundry/userhistory_page.dart';
 import 'package:washywashy_laundry/userprofile.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class WashPage extends StatefulWidget {
   const WashPage({super.key});
@@ -13,8 +14,9 @@ class WashPage extends StatefulWidget {
 }
 
 class _WashPageState extends State<WashPage> {
-
-  int _selectedIndex=0;
+  String? selectedWasherKg;
+  String? selectedWasherPrice;
+  int _selectedIndex = 0;
 
   void _onBottomNavTapped(int index) {
     if (index == _selectedIndex) return;
@@ -37,6 +39,27 @@ class _WashPageState extends State<WashPage> {
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const UserHistoryPage()));
         break;
     }
+  }
+
+  void _addToCart() {
+    if (selectedWasherKg == null || selectedWasherPrice == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select a washer machine")),
+      );
+      return;
+    }
+
+    final dbRef = FirebaseDatabase.instance.ref().child('Cart');
+    dbRef.push().set({
+      'washer': selectedWasherKg!,
+      'dryer': 'NONE',
+      'fold': 'NONE',
+      'total': selectedWasherPrice!,
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Added to cart")),
+    );
   }
 
   @override
@@ -67,11 +90,7 @@ class _WashPageState extends State<WashPage> {
                 children: [
                   const Text(
                     "Laundry Details",
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black),
                   ),
                   CircleAvatar(
                     radius: 18,
@@ -89,11 +108,7 @@ class _WashPageState extends State<WashPage> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   "Choose Washer Machine",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
                 ),
               ),
               const SizedBox(height: 10),
@@ -114,11 +129,7 @@ class _WashPageState extends State<WashPage> {
                   const SizedBox(width: 10),
                   const Text(
                     "WASHER",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
                   )
                 ],
               ),
@@ -130,9 +141,9 @@ class _WashPageState extends State<WashPage> {
                     "Total: ",
                     style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                   ),
-                  const Text(
-                    "RM 0.00",
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  Text(
+                    selectedWasherPrice ?? "RM 0.00",
+                    style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -141,10 +152,12 @@ class _WashPageState extends State<WashPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Image.asset('assets/imgaddtocart.png', width: 60, height: 60),
+                  GestureDetector(
+                    onTap: _addToCart,
+                    child: Image.asset('assets/imgaddtocart.png', width: 60, height: 60),
+                  ),
                   ElevatedButton(
                     onPressed: () {
-                      // Go to checkout
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const PaymentPage()),
@@ -169,25 +182,37 @@ class _WashPageState extends State<WashPage> {
   }
 
   Widget _buildWashMachine(String kg, String price) {
-    return Container(
-      width: 150,
-      height: 150,
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.grey.shade300, blurRadius: 5)],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset('assets/imgwashmacine.png', width: 60, height: 60),
-          const SizedBox(height: 5),
-          Text(kg,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF140435))),
-          Text(price,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFFC70A50))),
-        ],
+    final bool isSelected = selectedWasherKg == kg;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedWasherKg = kg;
+          selectedWasherPrice = price;
+        });
+      },
+      child: Container(
+        width: 150,
+        height: 150,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.blue.shade100 : Colors.white,
+          boxShadow: [BoxShadow(color: Colors.grey.shade300, blurRadius: 5)],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? Colors.blue : Colors.transparent,
+            width: 2,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/imgwashmacine.png', width: 60, height: 60),
+            const SizedBox(height: 5),
+            Text(kg, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF140435))),
+            Text(price, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFFC70A50))),
+          ],
+        ),
       ),
     );
   }
