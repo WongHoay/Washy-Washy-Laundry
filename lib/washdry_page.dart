@@ -5,6 +5,9 @@ import 'package:washywashy_laundry/home_page.dart';
 import 'package:washywashy_laundry/userhistory_page.dart';
 import 'package:washywashy_laundry/userprofile.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'dart:math';
+
+
 
 class WashDryPage extends StatefulWidget {
   const WashDryPage({super.key});
@@ -20,6 +23,12 @@ class _WashDryPageState extends State<WashDryPage> {
   String? selectedDryerKg;
   double washerPrice = 0.0;
   double dryerPrice = 0.0;
+
+  String generateOtp() {
+    final random = Random();
+    return '${random.nextInt(900) + 100} ${random.nextInt(900) + 100}';
+  }
+
 
   void _onNavTapped(int index) {
     if (_selectedIndex == index) return;
@@ -181,6 +190,8 @@ class _WashDryPageState extends State<WashDryPage> {
                               dryer: selectedDryerKg ?? 'NONE',
                               fold: 'NONE',
                               total: 'RM ${getTotalPrice().toStringAsFixed(2)}',
+                              paymentMethod: 'NONE', // or whatever method is selected
+                              otp: generateOtp(), // create a method for this
                             ),
                           ),
                         );
@@ -254,4 +265,5 @@ class _WashDryPageState extends State<WashDryPage> {
       ),
     );
   }
+
 }

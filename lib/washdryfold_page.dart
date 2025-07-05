@@ -181,6 +181,8 @@ class _WashDryFoldPageState extends State<WashDryFoldPage> {
                                 dryer: selectedDryerKg ?? 'NONE',
                                 fold: selectedFoldKg ?? 'NONE',
                                 total: 'RM ${getTotalPrice().toStringAsFixed(2)}',
+                                paymentMethod: 'NONE',
+                                otp: '',
                               ),
                             ),
                         );

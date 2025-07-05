@@ -1,7 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
+
 
 class UserHistoryDetailsPage extends StatelessWidget {
-  const UserHistoryDetailsPage({super.key});
+  final String washer;
+  final String dryer;
+  final String fold;
+  final String total;
+  final String method;
+  final String date;
+  final String otp;
+
+  const UserHistoryDetailsPage({
+    super.key,
+    required this.washer,
+    required this.dryer,
+    required this.fold,
+    required this.total,
+    required this.method,
+    required this.date,
+    required this.otp,
+  });
 
   @override
   Widget build(BuildContext context) {

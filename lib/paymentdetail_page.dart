@@ -1,7 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:washywashy_laundry/cart_page.dart';
+import 'package:washywashy_laundry/home_page.dart';
+import 'package:washywashy_laundry/userhistory_page.dart';
+import 'package:washywashy_laundry/userprofile.dart';
 
-class PaymentDetailsPage extends StatelessWidget {
-  const PaymentDetailsPage({super.key});
+class PaymentDetailsPage extends StatefulWidget {
+  final String washer;
+  final String dryer;
+  final String fold;
+  final String total;
+  final String paymentMethod;
+  final String timestamp;
+  final String otp;
+
+  const PaymentDetailsPage({
+    super.key,
+    required this.washer,
+    required this.dryer,
+    required this.fold,
+    required this.total,
+    required this.paymentMethod,
+    required this.timestamp,
+    required this.otp,
+  });
+
+  @override
+  State<PaymentDetailsPage> createState() => _PaymentDetailsPageState();
+}
+
+class _PaymentDetailsPageState extends State<PaymentDetailsPage> {
+
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    if (_selectedIndex == index) return;
+
+    setState(() => _selectedIndex = index);
+
+    switch (index) {
+      case 0:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage()));
+        break;
+      case 1:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const UserProfilePage()));
+        break;
+      case 2:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const UserCartPage()));
+        break;
+      case 3:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const UserHistoryPage()));
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,13 +61,14 @@ class PaymentDetailsPage extends StatelessWidget {
         backgroundColor: const Color(0xFFE0F7FA),
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
         ],
-        onTap: (index) {
-          // Handle nav
-        },
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -31,89 +82,14 @@ class PaymentDetailsPage extends StatelessWidget {
               ),
               const SizedBox(height: 10),
 
-              // Wash
-              Row(
-                children: [
-                  Image.asset('assets/imgwashmacine.png', width: 40, height: 40),
-                  const SizedBox(width: 20),
-                  const Text(
-                    'NONE',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-
-              // Dry
-              Row(
-                children: [
-                  Image.asset('assets/imgdrymachine.png', width: 45, height: 45),
-                  const SizedBox(width: 20),
-                  const Text(
-                    'NONE',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-
-              // Fold
-              Row(
-                children: [
-                  Image.asset('assets/imgfoldmachine.png', width: 40, height: 40),
-                  const SizedBox(width: 20),
-                  const Text(
-                    'NONE',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
+              _buildRowWithImage('assets/imgwashmacine.png', widget.washer),
+              _buildRowWithImage('assets/imgdrymachine.png', widget.dryer),
+              _buildRowWithImage('assets/imgfoldmachine.png', widget.fold),
               const SizedBox(height: 20),
 
-              // Total
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    'Total Payment :',
-                    style: TextStyle(color: Color(0xFF3B1B0D)),
-                  ),
-                  Text(
-                    'RM 0.00',
-                    style: TextStyle(color: Color(0xFF3B1B0D)),
-                  ),
-                ],
-              ),
-
-              // Method
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    'Method Payment :',
-                    style: TextStyle(color: Color(0xFF3B1B0D)),
-                  ),
-                  Text(
-                    'Touch n Go',
-                    style: TextStyle(color: Color(0xFF3B1B0D)),
-                  ),
-                ],
-              ),
-
-              // Date
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    'Date :',
-                    style: TextStyle(color: Color(0xFF3B1B0D)),
-                  ),
-                  Text(
-                    '02/07/2025',
-                    style: TextStyle(color: Color(0xFF3B1B0D)),
-                  ),
-                ],
-              ),
+              _buildInfoRow('Total Payment :', widget.total),
+              _buildInfoRow('Method Payment :', widget.paymentMethod),
+              _buildInfoRow('Date :', widget.timestamp),
 
               const SizedBox(height: 50),
 
@@ -130,14 +106,14 @@ class PaymentDetailsPage extends StatelessWidget {
               ),
               const SizedBox(height: 10),
 
-              const Center(
+              Center(
                 child: Text(
-                  '000 000',
-                  style: TextStyle(
+                  widget.otp,
+                  style: const TextStyle(
                     fontSize: 45,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFFE62B2B),
-                    letterSpacing: 0.03,
+                    letterSpacing: 3,
                   ),
                 ),
               ),
@@ -145,6 +121,35 @@ class PaymentDetailsPage extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildRowWithImage(String imgPath, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Image.asset(imgPath, width: 40, height: 40),
+          const SizedBox(width: 20),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: const TextStyle(color: Color(0xFF3B1B0D))),
+          Text(value, style: const TextStyle(color: Color(0xFF3B1B0D))),
+        ],
       ),
     );
   }

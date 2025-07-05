@@ -187,7 +187,16 @@ class _DryPageState extends State<DryPage> {
                       // Go to checkout
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const PaymentPage()),
+                        MaterialPageRoute(
+                          builder: (context) => PaymentPage(
+                            washer: 'NONE',
+                            dryer: selectedDryerKg ?? 'NONE',
+                            fold: 'NONE',
+                            total: selectedDryerPrice ?? 'RM 0.00',
+                            paymentMethod: 'Online Banking', // <-- You can change this dynamically if needed
+                            otp: '',
+                          ),
+                        ),
                       );
                     },
                     style: ElevatedButton.styleFrom(

@@ -3,30 +3,50 @@ import 'package:washywashy_laundry/cart_page.dart';
 import 'package:washywashy_laundry/home_page.dart';
 import 'package:washywashy_laundry/userprofile.dart';
 import 'package:washywashy_laundry/widgets/order_history_item.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:washywashy_laundry/userhistorydetail_page.dart';
+
 
 class UserHistoryPage extends StatefulWidget {
   const UserHistoryPage({super.key});
+
+
 
   @override
   State<UserHistoryPage> createState() => _UserHistoryPageState();
 }
 
 class _UserHistoryPageState extends State<UserHistoryPage> {
+  List<Map<String, dynamic>> _historyItems = [];
+
   // Example data (replace with Firebase or local DB)
-  final List<Map<String, String>> _history = const [
-    {
-      'otp': 'OTP: 234 567',
-      'washer': '15 KG',
-      'dryer': '20 KG',
-      'fold': 'NONE',
-    },
-    {
-      'otp': 'OTP: 887 112',
-      'washer': '20 KG',
-      'dryer': 'NONE',
-      'fold': '15 KG',
-    },
-  ];
+  final DatabaseReference _historyRef = FirebaseDatabase.instance.ref().child('OrderHistory');
+  final List<Map<String, String>> _history = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchHistory();
+  }
+
+  void _fetchHistory() {
+    _historyRef.onValue.listen((event) {
+      final data = event.snapshot.value;
+      if (data != null && data is Map) {
+        final List<Map<String, dynamic>> items = [];
+
+        data.forEach((key, value) {
+          if (value is Map) {
+            items.add(Map<String, dynamic>.from(value));
+          }
+        });
+
+        setState(() {
+          _historyItems = items.reversed.toList(); // newest first
+        });
+      }
+    });
+  }
 
   int _selectedIndex = 3; // History index
 
@@ -122,17 +142,36 @@ class _UserHistoryPageState extends State<UserHistoryPage> {
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: _history.length,
+                itemCount: _historyItems.length,
                 itemBuilder: (context, index) {
-                  final item = _history[index];
-                  return OrderHistoryItem(
-                    otp: item['otp'] ?? '',
-                    washer: item['washer'] ?? 'NONE',
-                    dryer: item['dryer'] ?? 'NONE',
-                    fold: item['fold'] ?? 'NONE',
+                  final item = _historyItems[index];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => UserHistoryDetailsPage(
+                            washer: item['washer'] ?? 'NONE',
+                            dryer: item['dryer'] ?? 'NONE',
+                            fold: item['fold'] ?? 'NONE',
+                            total: item['total'] ?? 'RM 0.00',
+                            method: item['paymentMethod'] ?? 'Unknown',
+                            date: item['date'] ?? '',
+                            otp: item['otp'] ?? '',
+                          ),
+                        ),
+                      );
+                    },
+                    child: OrderHistoryItem(
+                      otp: item['otp'] ?? '',
+                      washer: item['washer'] ?? 'NONE',
+                      dryer: item['dryer'] ?? 'NONE',
+                      fold: item['fold'] ?? 'NONE',
+                    ),
                   );
                 },
               ),
+
 
               const SizedBox(height: 80), // Space for bottom nav
             ],

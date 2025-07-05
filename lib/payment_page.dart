@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:washywashy_laundry/paymentdetail_page.dart';
+import 'package:intl/intl.dart';
+
 
 class PaymentPage extends StatefulWidget {
   final List<Map<String, String>>? selectedCartItems; // Nullable and optional
@@ -10,6 +12,8 @@ class PaymentPage extends StatefulWidget {
   final String dryer;
   final String fold;
   final String total;
+  final String paymentMethod;
+  final String otp;
 
   const PaymentPage({
     super.key,
@@ -18,6 +22,8 @@ class PaymentPage extends StatefulWidget {
     required this.dryer,
     required this.fold,
     required this.total,
+    required this.paymentMethod,
+    required this.otp,
   });
 
   @override
@@ -159,11 +165,11 @@ class _PaymentPageState extends State<PaymentPage> {
 
                     final historyRef = FirebaseDatabase.instance.ref().child('OrderHistory');
                     historyRef.push().set({
-                      'otp': generatedOtp,
-                      'washer': selectedWasherKg ?? 'NONE',
-                      'dryer': selectedDryerKg ?? 'NONE',
-                      'fold': 'NONE',
-                      'total': 'RM ${getTotalPrice().toStringAsFixed(2)}',
+                      'otp': otp,
+                      'washer': widget.washer,
+                      'dryer': widget.dryer,
+                      'fold': widget.fold,
+                      'total': 'RM ${calculateTotal().toStringAsFixed(2)}',
                       'paymentMethod': selectedPaymentMethod,
                       'date': DateFormat('dd/MM/yyyy').format(DateTime.now()),
                     });

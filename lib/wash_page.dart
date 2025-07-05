@@ -160,7 +160,16 @@ class _WashPageState extends State<WashPage> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const PaymentPage()),
+                        MaterialPageRoute(
+                          builder: (context) => PaymentPage(
+                            washer: 'NONE',
+                            dryer: selectedWasherKg ?? 'NONE',
+                            fold: 'NONE',
+                            total: selectedWasherPrice ?? 'RM 0.00',
+                            paymentMethod: 'Online Banking',
+                            otp: '',
+                          ),
+                        ),
                       );
                     },
                     style: ElevatedButton.styleFrom(

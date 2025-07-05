@@ -127,6 +127,8 @@ class _UserCartPageState extends State<UserCartPage> {
           dryer: 'NONE',
           fold: 'NONE',
           total: 'RM 0.00',
+          paymentMethod: 'NONE',
+          otp: '',
         ),
       ),
     );
