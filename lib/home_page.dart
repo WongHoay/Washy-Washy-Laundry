@@ -7,45 +7,57 @@ import 'package:washywashy_laundry/cart_page.dart';
 import 'package:washywashy_laundry/userprofile.dart';
 import 'package:washywashy_laundry/userhistory_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+
+  void _onBottomNavTapped(int index) {
+    if (_selectedIndex == index) return;
+
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 1:
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage()));
+        break;
+      case 2:
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const UserCartPage()));
+        break;
+      case 3:
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const UserHistoryPage()));
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
 
-      // Bottom Navigation Bar
+      // ✅ Bottom Navigation Bar - properly wired to _onBottomNavTapped
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         selectedItemColor: Colors.blue,
-        unselectedItemColor: Color(0xFF3C3F43),
-        currentIndex: 0,
-        onTap: (index) {
-          switch (index) {
-            case 0:
-            // Already in Home
-              break;
-            case 1:
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage()));
-              break;
-            case 2:
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const UserCartPage()));
-              break;
-            case 3:
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const UserHistoryPage()));
-              break;
-          }
-        },
+        unselectedItemColor: const Color(0xFF3C3F43),
+        currentIndex: _selectedIndex, // ← Bind to state variable
+        onTap: _onBottomNavTapped,   // ← Use the function you defined
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: "Cart"),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: "History"),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
         ],
       ),
 
-      // Body Content
+      // ✅ Page content
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(10),
