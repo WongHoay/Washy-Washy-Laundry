@@ -18,6 +18,7 @@ class _UserCartPageState extends State<UserCartPage> {
 
   int _selectedIndex = 2;
   final List<Map<String, String>> cartItems = [];
+  final Set<int> selectedIndices = {}; // ✅ For tracking selected items
   bool _isLoading = true;
 
   @override
@@ -75,6 +76,43 @@ class _UserCartPageState extends State<UserCartPage> {
     }
   }
 
+  void _toggleSelection(int index) {
+    setState(() {
+      if (selectedIndices.contains(index)) {
+        selectedIndices.remove(index);
+      } else {
+        selectedIndices.add(index);
+      }
+    });
+  }
+
+  void _deleteSelectedItems() async {
+    final dbRef = FirebaseDatabase.instance.ref().child('Cart');
+    final snapshot = await dbRef.get();
+
+    if (!snapshot.exists) return;
+
+    final data = snapshot.value as Map<dynamic, dynamic>;
+
+    int currentIndex = 0;
+    for (var entry in data.entries) {
+      if (selectedIndices.contains(currentIndex)) {
+        await dbRef.child(entry.key).remove(); // Delete from Firebase
+      }
+      currentIndex++;
+    }
+
+    setState(() {
+      // Remove from end to avoid index shifting issues
+      final indices = selectedIndices.toList()..sort((a, b) => b.compareTo(a));
+      for (var index in indices) {
+        cartItems.removeAt(index);
+      }
+      selectedIndices.clear();
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
 
@@ -89,6 +127,15 @@ class _UserCartPageState extends State<UserCartPage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
+
+      floatingActionButton: selectedIndices.isNotEmpty
+          ? FloatingActionButton.extended(
+        onPressed: _deleteSelectedItems,
+        icon: const Icon(Icons.delete),
+        label: const Text('Delete Selected'),
+        backgroundColor: Colors.red,
+      )
+          : null,
 
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
@@ -106,7 +153,9 @@ class _UserCartPageState extends State<UserCartPage> {
 
 
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
           padding: const EdgeInsets.all(10),
           child: Column(
             children: [
@@ -145,11 +194,26 @@ class _UserCartPageState extends State<UserCartPage> {
                 itemCount: cartItems.length,
                 itemBuilder: (context, index) {
                   final item = cartItems[index];
-                  return CartItem(
+                  final isSelected = selectedIndices.contains(index);
+
+                  return GestureDetector(
+                      onTap: () => _toggleSelection(index),
+                      child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 5),
+                      decoration: BoxDecoration(
+                      border: Border.all(
+                      color: isSelected
+                      ? Colors.blue
+                          : Colors.transparent,
+                      width: 2),
+                  borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: CartItem(
                     total: item['total']!,
                     washer: item['washer']!,
                     dryer: item['dryer']!,
                     fold: item['fold']!,
+                  )),
                   );
                 },
               ),
