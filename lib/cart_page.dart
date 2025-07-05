@@ -123,6 +123,10 @@ class _UserCartPageState extends State<UserCartPage> {
       MaterialPageRoute(
         builder: (context) => PaymentPage(
           selectedCartItems: selectedItems,
+          washer: 'NONE', // or you can derive if needed
+          dryer: 'NONE',
+          fold: 'NONE',
+          total: 'RM 0.00',
         ),
       ),
     );

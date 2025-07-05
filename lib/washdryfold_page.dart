@@ -174,7 +174,16 @@ class _WashDryFoldPageState extends State<WashDryFoldPage> {
                     width: 300,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => const PaymentPage()));
+                        Navigator.push(context,
+                            MaterialPageRoute(
+                              builder: (context) => PaymentPage(
+                                washer: selectedWasherKg ?? 'NONE',
+                                dryer: selectedDryerKg ?? 'NONE',
+                                fold: selectedFoldKg ?? 'NONE',
+                                total: 'RM ${getTotalPrice().toStringAsFixed(2)}',
+                              ),
+                            ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFA3C6DA),
