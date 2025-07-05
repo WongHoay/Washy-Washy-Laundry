@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:washywashy_laundry/sign_in.dart';
 import 'package:washywashy_laundry/edit_profile.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
@@ -10,6 +13,53 @@ class UserProfilePage extends StatefulWidget {
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
+  String name = '';
+  String email = '';
+  String gender = '';
+  String phone = '';
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserData();
+  }
+
+  Future<void> fetchUserData() async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      print("UID: $uid");
+
+      if (uid != null) {
+        final ref = FirebaseDatabase.instance.ref().child('Users/$uid');
+        final snapshot = await ref.get();
+
+        if (snapshot.exists) {
+          final data = Map<String, dynamic>.from(snapshot.value as Map);
+          print("User data: $data");
+
+          setState(() {
+            name = data['name'] ?? '';
+            email = data['email'] ?? '';
+            gender = data['gender'] ?? '';
+            phone = data['phone']?.toString() ?? '';
+            isLoading = false;
+          });
+        } else {
+          print("No user data found in Realtime DB.");
+        }
+      } else {
+        print("User is not logged in");
+      }
+    } catch (e) {
+      print("Error fetching user data from Realtime DB: $e");
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,9 +94,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
       body: RefreshIndicator(
         onRefresh: () async {
           // Handle refresh logic
+          await fetchUserData();
         },
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.only(bottom: 100),
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 100),
           child: Padding(
             padding: const EdgeInsets.all(10),
             child: Column(
@@ -81,9 +134,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       backgroundImage: AssetImage('assets/imgprofile.png'),
                     ),
                     const SizedBox(width: 10),
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'welcomeName...',
+                        'Welcome, $name',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -106,13 +159,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ),
                   child: Column(
                     children: [
-                      _buildInfoRow('assets/imgname.png', 'nameUser...'),
+                      _buildInfoRow('assets/imgname.png', name),
                       _buildDivider(),
-                      _buildInfoRow('assets/imgemail.png', 'emailUser...'),
+                      _buildInfoRow('assets/imgemail.png', email),
                       _buildDivider(),
-                      _buildInfoRow('assets/imggender.png', 'genderUser...'),
+                      _buildInfoRow('assets/imggender.png', gender),
                       _buildDivider(),
-                      _buildInfoRow('assets/imgphone.png', 'phoneUser...'),
+                      _buildInfoRow('assets/imgphone.png', phone),
                       _buildDivider(),
                       TextButton(
                         onPressed: () {
