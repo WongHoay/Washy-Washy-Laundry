@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class PaymentPage extends StatefulWidget {
-  const PaymentPage({super.key});
+  final List<Map<String, String>>? selectedCartItems; // Nullable and optional
+  const PaymentPage({super.key, this.selectedCartItems});
 
   @override
   State<PaymentPage> createState() => _PaymentPageState();
@@ -9,6 +10,19 @@ class PaymentPage extends StatefulWidget {
 
 class _PaymentPageState extends State<PaymentPage> {
   String selectedPaymentMethod = '';
+
+  double calculateTotal() {
+    if (widget.selectedCartItems == null) return 0.0;
+
+    double total = 0.0;
+    for (var item in widget.selectedCartItems!) {
+      final totalString = item['total']?.replaceAll('RM', '').trim();
+      final amount = double.tryParse(totalString ?? '0') ?? 0.0;
+      total += amount;
+    }
+    return total;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -47,12 +61,26 @@ class _PaymentPageState extends State<PaymentPage> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
-              _buildOrderRow('assets/imgwashmacine.png', 'NONE'),
-              _buildOrderRow('assets/imgdrymachine.png', 'NONE'),
-              _buildOrderRow('assets/imgfoldmachine.png', 'NONE'),
+              ...(widget.selectedCartItems?.isNotEmpty ?? false)
+                  ? widget.selectedCartItems!.map((item) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildOrderRow('assets/imgwashmacine.png', item['washer'] ?? 'NONE'),
+                    _buildOrderRow('assets/imgdrymachine.png', item['dryer'] ?? 'NONE'),
+                    _buildOrderRow('assets/imgfoldmachine.png', item['fold'] ?? 'NONE'),
+                    const SizedBox(height: 10),
+                  ],
+                );
+              }).toList()
+                  : [
+                _buildOrderRow('assets/imgwashmacine.png', 'NONE'),
+                _buildOrderRow('assets/imgdrymachine.png', 'NONE'),
+                _buildOrderRow('assets/imgfoldmachine.png', 'NONE'),
+              ],
               const SizedBox(height: 20),
               Row(
-                children: const [
+                children:  [
                   Text(
                     'Total Amount :',
                     style: TextStyle(
@@ -63,7 +91,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   ),
                   SizedBox(width: 10),
                   Text(
-                    'RM 0.00',
+                    'RM ${calculateTotal().toStringAsFixed(2)}',
                     style: TextStyle(
                       fontSize: 25,
                       fontWeight: FontWeight.bold,

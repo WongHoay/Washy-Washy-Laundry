@@ -3,6 +3,8 @@ import 'package:washywashy_laundry/userhistory_page.dart';
 import 'package:washywashy_laundry/userprofile.dart';
 import 'package:washywashy_laundry/widgets/cart_item.dart';
 import 'package:washywashy_laundry/home_page.dart';
+import 'package:washywashy_laundry/payment_page.dart';
+
 
 import 'package:firebase_database/firebase_database.dart';
 
@@ -111,6 +113,22 @@ class _UserCartPageState extends State<UserCartPage> {
       selectedIndices.clear();
     });
   }
+  void _checkoutSelectedItems() {
+    final selectedItems = selectedIndices.map((index) => cartItems[index]).toList();
+
+    if (selectedItems.isEmpty) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PaymentPage(
+          selectedCartItems: selectedItems,
+        ),
+      ),
+    );
+  }
+
+
 
 
   @override
@@ -129,11 +147,23 @@ class _UserCartPageState extends State<UserCartPage> {
       backgroundColor: Colors.white,
 
       floatingActionButton: selectedIndices.isNotEmpty
-          ? FloatingActionButton.extended(
-        onPressed: _deleteSelectedItems,
-        icon: const Icon(Icons.delete),
-        label: const Text('Delete Selected'),
-        backgroundColor: Colors.red,
+          ? Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton.extended(
+            onPressed: _deleteSelectedItems,
+            icon: const Icon(Icons.delete),
+            label: const Text('Delete Selected'),
+            backgroundColor: Colors.red,
+          ),
+          const SizedBox(height: 10),
+          FloatingActionButton.extended(
+            onPressed: _checkoutSelectedItems,
+            icon: const Icon(Icons.shopping_bag),
+            label: const Text('Checkout Selected'),
+            backgroundColor: Colors.green,
+          ),
+        ],
       )
           : null,
 
