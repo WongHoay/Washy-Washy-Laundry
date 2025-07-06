@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:washywashy_laundry/cart_page.dart';
 import 'package:washywashy_laundry/home_page.dart';
@@ -6,6 +5,7 @@ import 'package:washywashy_laundry/userprofile.dart';
 import 'package:washywashy_laundry/widgets/order_history_item.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:washywashy_laundry/userhistorydetail_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 
 class UserHistoryPage extends StatefulWidget {

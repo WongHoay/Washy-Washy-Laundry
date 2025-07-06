@@ -20,7 +20,7 @@ class _UserCartPageState extends State<UserCartPage> {
 
   int _selectedIndex = 2;
   final List<Map<String, String>> cartItems = [];
-  final Set<int> selectedIndices = {}; // ✅ For tracking selected items
+  final Set<int> selectedIndices = {}; //for tracking selected items
   bool _isLoading = true;
 
   @override

@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
           fold: '',
           total: '',
           paymentMethod: '',
-          timestamp: '',
+          date: '',
           otp: '',
         ),
         '/cart': (context) => const UserCartPage(),

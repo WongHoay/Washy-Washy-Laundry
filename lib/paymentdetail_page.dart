@@ -11,7 +11,7 @@ class PaymentDetailsPage extends StatefulWidget {
   final String fold;
   final String total;
   final String paymentMethod;
-  final String timestamp;
+  final String date;
   final String otp;
 
   const PaymentDetailsPage({
@@ -21,7 +21,7 @@ class PaymentDetailsPage extends StatefulWidget {
     required this.fold,
     required this.total,
     required this.paymentMethod,
-    required this.timestamp,
+    required this.date,
     required this.otp,
   });
 
@@ -90,7 +90,7 @@ class _PaymentDetailsPageState extends State<PaymentDetailsPage> {
 
               _buildInfoRow('Total Payment :', widget.total),
               _buildInfoRow('Method Payment :', widget.paymentMethod),
-              _buildInfoRow('Date :', widget.timestamp),
+              _buildInfoRow('Date :', widget.date),
 
               const SizedBox(height: 50),
 

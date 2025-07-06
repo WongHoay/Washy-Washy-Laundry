@@ -5,9 +5,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:washywashy_laundry/paymentdetail_page.dart';
 import 'package:intl/intl.dart';
 
-
 class PaymentPage extends StatefulWidget {
-  final List<Map<String, String>>? selectedCartItems; // Nullable and optional
+  final List<Map<String, String>>? selectedCartItems;
   final String washer;
   final String dryer;
   final String fold;
@@ -35,8 +34,9 @@ class _PaymentPageState extends State<PaymentPage> {
 
   String _generateOtp() {
     final random = Random();
-    return (100000 + random.nextInt(900000)).toString(); // 6-digit OTP
+    return (100000 + random.nextInt(900000)).toString();
   }
+
   double calculateTotal() {
     if (widget.selectedCartItems != null && widget.selectedCartItems!.isNotEmpty) {
       double total = 0.0;
@@ -47,13 +47,10 @@ class _PaymentPageState extends State<PaymentPage> {
       }
       return total;
     } else {
-      // Fallback to individual prices passed from WashDryPage
       final totalString = widget.total.replaceAll('RM', '').trim();
       return double.tryParse(totalString) ?? 0.0;
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +63,8 @@ class _PaymentPageState extends State<PaymentPage> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
         ],
         onTap: (index) {
           // Handle bottom nav tap
@@ -77,21 +76,13 @@ class _PaymentPageState extends State<PaymentPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Proceed to Payment',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  letterSpacing: 0.03,
-                ),
-              ),
+              const Text('Proceed to Payment',
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
               const SizedBox(height: 20),
-              const Text(
-                'Order Details',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+              const Text('Order Details',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
+
               ...(widget.selectedCartItems?.isNotEmpty ?? false)
                   ? widget.selectedCartItems!.map((item) {
                 return Column(
@@ -109,33 +100,21 @@ class _PaymentPageState extends State<PaymentPage> {
                 _buildOrderRow('assets/imgdrymachine.png', widget.dryer),
                 _buildOrderRow('assets/imgfoldmachine.png', widget.fold),
               ],
+
               const SizedBox(height: 20),
               Row(
-                children:  [
-                  Text(
-                    'Total Amount :',
-                    style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Text(
-                    'RM ${calculateTotal().toStringAsFixed(2)}',
-                    style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
+                children: [
+                  const Text('Total Amount:',
+                      style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
+                  const SizedBox(width: 10),
+                  Text('RM ${calculateTotal().toStringAsFixed(2)}',
+                      style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
                 ],
               ),
+
               const SizedBox(height: 30),
-              const Text(
-                'Select Payment Method',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+              const Text('Select Payment Method',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
               Column(
                 children: [
@@ -146,11 +125,11 @@ class _PaymentPageState extends State<PaymentPage> {
                 ],
               ),
               const SizedBox(height: 20),
+
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () async {
-                    // Handle payment confirmation
                     if (selectedPaymentMethod.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Please select a payment method')),
@@ -159,50 +138,44 @@ class _PaymentPageState extends State<PaymentPage> {
                     }
 
                     final otp = _generateOtp();
-                    final timestamp = DateTime.now().toString();
+                    final date = DateTime.now().toString();
                     final user = FirebaseAuth.instance.currentUser;
                     final userId = user?.uid ?? 'unknown';
 
-                    final historyRef = FirebaseDatabase.instance.ref().child('OrderHistory');
-                    historyRef.push().set({
-                      'otp': otp,
-                      'washer': widget.washer,
-                      'dryer': widget.dryer,
-                      'fold': widget.fold,
-                      'total': 'RM ${calculateTotal().toStringAsFixed(2)}',
-                      'paymentMethod': selectedPaymentMethod,
-                      'date': DateFormat('dd/MM/yyyy').format(DateTime.now()),
-                    });
+                    final firstItem = widget.selectedCartItems?.isNotEmpty == true
+                        ? widget.selectedCartItems!.first
+                        : null;
 
-                    //.ref()
-                        //.child('History')
-                        //.push(); // auto-generate ID
-
-                    final firstItem = widget.selectedCartItems?.isNotEmpty == true ? widget.selectedCartItems!.first : null;
-
-                    final data = {
+                    final orderData = {
                       'washer': firstItem?['washer'] ?? widget.washer,
                       'dryer': firstItem?['dryer'] ?? widget.dryer,
                       'fold': firstItem?['fold'] ?? widget.fold,
                       'total': 'RM ${calculateTotal().toStringAsFixed(2)}',
                       'paymentMethod': selectedPaymentMethod,
-                      'timestamp': timestamp,
+                      'date': DateFormat('dd/MM/yyyy').format(DateTime.now()),
+                      //'date': date,
                       'otp': otp,
                       'userId': userId,
                     };
 
-                    await historyRef.set(data);
+                    // Only push once here
+                    final historyRef = FirebaseDatabase.instance
+                        .ref()
+                        .child('History')
+                        .push(); // generates unique key
+
+                    await historyRef.set(orderData);
 
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                         builder: (context) => PaymentDetailsPage(
-                          washer: data['washer']!,
-                          dryer: data['dryer']!,
-                          fold: data['fold']!,
-                          total: data['total']!,
+                          washer: orderData['washer']!,
+                          dryer: orderData['dryer']!,
+                          fold: orderData['fold']!,
+                          total: orderData['total']!,
                           paymentMethod: selectedPaymentMethod,
-                          timestamp: timestamp,
+                          date: date,
                           otp: otp,
                         ),
                       ),
@@ -212,14 +185,8 @@ class _PaymentPageState extends State<PaymentPage> {
                     backgroundColor: const Color(0xFF6E9BB5),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child: const Text(
-                    'Confirm Payment',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: const Text('Confirm Payment',
+                      style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -236,14 +203,7 @@ class _PaymentPageState extends State<PaymentPage> {
         children: [
           Image.asset(imagePath, width: 40, height: 40),
           const SizedBox(width: 20),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          )
+          Text(label, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         ],
       ),
     );
