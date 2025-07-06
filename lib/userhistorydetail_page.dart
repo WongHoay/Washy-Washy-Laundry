@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:washywashy_laundry/home_page.dart';
+import 'package:washywashy_laundry/userprofile.dart';
+import 'package:washywashy_laundry/userhistory_page.dart';
+import 'package:washywashy_laundry/cart_page.dart';
 
-
-class UserHistoryDetailsPage extends StatelessWidget {
+class UserHistoryDetailsPage extends StatefulWidget {
   final String washer;
   final String dryer;
   final String fold;
@@ -23,33 +25,51 @@ class UserHistoryDetailsPage extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    // Mock data (replace with actual data or Firebase)
-    const washer = '15 KG';
-    const dryer = '20 KG';
-    const fold = 'NONE';
-    const total = 'RM 25.00';
-    const method = 'Online Banking';
-    const date = '03/07/2025';
-    const otp = '783 211';
+  State<UserHistoryDetailsPage> createState() => _UserHistoryDetailsPageState();
+}
 
+class _UserHistoryDetailsPageState extends State<UserHistoryDetailsPage> {
+  int _selectedIndex = 1; // History is selected
+
+  void _onNavTapped(int index) {
+    if (_selectedIndex == index) return;
+
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 0:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage()));
+        break;
+      case 1:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const UserHistoryPage()));
+        break;
+      case 2:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const UserProfilePage()));
+        break;
+      case 3:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=> const UserCartPage()));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFFE0F7FA),
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex,
+        onTap: _onNavTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart),label: 'Cart')
         ],
-        onTap: (index) {
-          // Handle navigation here
-        },
       ),
-
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(15),
@@ -69,7 +89,7 @@ class UserHistoryDetailsPage extends StatelessWidget {
                   Image.asset('assets/imgwashmacine.png', width: 40, height: 40),
                   const SizedBox(width: 20),
                   Text(
-                    washer,
+                    widget.washer,
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   )
                 ],
@@ -83,7 +103,7 @@ class UserHistoryDetailsPage extends StatelessWidget {
                   Image.asset('assets/imgdrymachine.png', width: 45, height: 45),
                   const SizedBox(width: 20),
                   Text(
-                    dryer,
+                    widget.dryer,
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   )
                 ],
@@ -97,7 +117,7 @@ class UserHistoryDetailsPage extends StatelessWidget {
                   Image.asset('assets/imgfoldmachine.png', width: 40, height: 40),
                   const SizedBox(width: 20),
                   Text(
-                    fold,
+                    widget.fold,
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   )
                 ],
@@ -110,7 +130,7 @@ class UserHistoryDetailsPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text("Total Payment:", style: TextStyle(color: Color(0xFF3B1B0D))),
-                  Text(total, style: const TextStyle(color: Color(0xFF3B1B0D))),
+                  Text(widget.total, style: const TextStyle(color: Color(0xFF3B1B0D))),
                 ],
               ),
 
@@ -119,7 +139,7 @@ class UserHistoryDetailsPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text("Method Payment:", style: TextStyle(color: Color(0xFF3B1B0D))),
-                  Text(method, style: const TextStyle(color: Color(0xFF3B1B0D))),
+                  Text(widget.method, style: const TextStyle(color: Color(0xFF3B1B0D))),
                 ],
               ),
 
@@ -128,7 +148,7 @@ class UserHistoryDetailsPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text("Date:", style: TextStyle(color: Color(0xFF3B1B0D))),
-                  Text(date, style: const TextStyle(color: Color(0xFF3B1B0D))),
+                  Text(widget.date, style: const TextStyle(color: Color(0xFF3B1B0D))),
                 ],
               ),
 
@@ -150,12 +170,12 @@ class UserHistoryDetailsPage extends StatelessWidget {
 
               Center(
                 child: Text(
-                  otp,
+                  widget.otp,
                   style: const TextStyle(
-                    fontSize: 25,
+                    fontSize: 30,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFFC70A50),
-                    letterSpacing: 0.03,
+                    letterSpacing: 3,
                   ),
                 ),
               ),
