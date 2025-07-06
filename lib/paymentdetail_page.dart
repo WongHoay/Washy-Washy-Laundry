@@ -3,6 +3,7 @@ import 'package:washywashy_laundry/cart_page.dart';
 import 'package:washywashy_laundry/home_page.dart';
 import 'package:washywashy_laundry/userhistory_page.dart';
 import 'package:washywashy_laundry/userprofile.dart';
+import 'dart:math';
 
 class PaymentDetailsPage extends StatefulWidget {
   final String washer;

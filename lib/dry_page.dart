@@ -5,7 +5,7 @@ import 'package:washywashy_laundry/payment_page.dart';
 import 'package:washywashy_laundry/userhistory_page.dart';
 import 'package:washywashy_laundry/userprofile.dart';
 import 'package:firebase_database/firebase_database.dart';
-
+import 'dart:math';
 
 class DryPage extends StatefulWidget {
   const DryPage({super.key});
@@ -16,22 +16,34 @@ class DryPage extends StatefulWidget {
 
 class _DryPageState extends State<DryPage> {
 
-  void addToCart() {
-    final cartRef = FirebaseDatabase.instance.ref().child('Cart');
+  void _addToCart() {
+    if (selectedDryerKg == null || selectedDryerPrice == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select a washer machine")),
+      );
+      return;
+    }
 
-    final cartItem = {
-      'dryer': selectedDryerKg ?? 'NONE',
+    final dbRef = FirebaseDatabase.instance.ref().child('Cart');
+    dbRef.push().set({
       'washer': 'NONE',
+      'dryer': selectedDryerKg!,
       'fold': 'NONE',
-      'total': selectedDryerPrice ?? 'RM 0.00',
-    };
+      'total': selectedDryerPrice!,
+    });
 
-    cartRef.push().set(cartItem);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Added to cart")),
+    );
   }
 
   String? selectedDryerKg;
   String? selectedDryerPrice;
 
+  String generateOtp() {
+    final random = Random();
+    return '${random.nextInt(900) + 100} ${random.nextInt(900) + 100}';
+  }
 
   int _selectedIndex=0;
 
@@ -143,13 +155,9 @@ class _DryPageState extends State<DryPage> {
                 children: [
                   Image.asset('assets/imgdrymachine.png', width: 45, height: 45),
                   const SizedBox(width: 10),
-                  const Text(
-                    "DRYER",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+                  Text(
+                    selectedDryerKg != null ? 'Washer: $selectedDryerKg ($selectedDryerPrice)' : 'DRYER',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
                   )
                 ],
               ),
@@ -174,17 +182,11 @@ class _DryPageState extends State<DryPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
-                    onTap: () {
-                      addToCart(); // 🔥 Call the function to add selected item
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Added to Cart")),
-                      );
-                    },
+                    onTap: _addToCart,
                     child: Image.asset('assets/imgaddtocart.png', width: 60, height: 60),
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      // Go to checkout
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -193,12 +195,13 @@ class _DryPageState extends State<DryPage> {
                             dryer: selectedDryerKg ?? 'NONE',
                             fold: 'NONE',
                             total: selectedDryerPrice ?? 'RM 0.00',
-                            paymentMethod: 'Online Banking', // <-- You can change this dynamically if needed
-                            otp: '',
+                            paymentMethod: 'NONE', // or whatever method is selected
+                            otp: generateOtp(), // create a method for this
                           ),
                         ),
                       );
                     },
+
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFA3C6DA),
                       padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 100),

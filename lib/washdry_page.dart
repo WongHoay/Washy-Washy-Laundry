@@ -141,7 +141,10 @@ class _WashDryPageState extends State<WashDryPage> {
                 children: [
                   Image.asset('assets/imgwashmacine.png', width: 40, height: 40),
                   const SizedBox(width: 20),
-                  const Text('WASHER', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(
+                    selectedWasherKg != null ? 'Washer: $selectedWasherKg ($washerPrice)' : 'WASHER',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                 ],
               ),
               const SizedBox(height: 10),
@@ -149,7 +152,10 @@ class _WashDryPageState extends State<WashDryPage> {
                 children: [
                   Image.asset('assets/imgdrymachine.png', width: 45, height: 45),
                   const SizedBox(width: 20),
-                  const Text('DRYER', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(
+                    selectedDryerKg != null ? 'Dryer: $selectedDryerKg ($dryerPrice)' : 'DRYER',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                 ],
               ),
               const SizedBox(height: 20),

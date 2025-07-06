@@ -139,9 +139,38 @@ class _WashDryFoldPageState extends State<WashDryFoldPage> {
               ),
               const SizedBox(height: 20),
 
-              _buildInfoRow('assets/imgwashmacine.png', 'WASHER'),
-              _buildInfoRow('assets/imgdrymachine.png', 'DRYER'),
-              _buildInfoRow('assets/imgfoldmachine.png', 'FOLD'),
+              Row(
+                children: [
+                  Image.asset('assets/imgwashmacine.png', width: 40, height: 40),
+                  const SizedBox(width: 20),
+                  Text(
+                    selectedWasherKg != null ? 'Washer: $selectedWasherKg ($washerPrice)' : 'WASHER',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Image.asset('assets/imgdrymachine.png', width: 45, height: 45),
+                  const SizedBox(width: 20),
+                  Text(
+                    selectedDryerKg != null ? 'Dryer: $selectedDryerKg ($dryerPrice)' : 'DRYER',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Image.asset('assets/imgfoldmachine.png', width: 45, height: 45),
+                  const SizedBox(width: 20),
+                  Text(
+                    selectedFoldKg != null ? 'Fold: $selectedFoldKg ($foldPrice)' : 'DRYER',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
               const SizedBox(height: 20),
 
               // Total

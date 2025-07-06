@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:washywashy_laundry/cart_page.dart';
 import 'package:washywashy_laundry/home_page.dart';
@@ -20,7 +21,7 @@ class _UserHistoryPageState extends State<UserHistoryPage> {
   List<Map<String, dynamic>> _historyItems = [];
 
   // Example data (replace with Firebase or local DB)
-  final DatabaseReference _historyRef = FirebaseDatabase.instance.ref().child('OrderHistory');
+  final DatabaseReference _historyRef = FirebaseDatabase.instance.ref().child('History');
   final List<Map<String, String>> _history = const [];
 
   @override
@@ -29,14 +30,19 @@ class _UserHistoryPageState extends State<UserHistoryPage> {
     _fetchHistory();
   }
 
-  void _fetchHistory() {
+  void _fetchHistory() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+
+    final currentUserId = currentUser.uid;
+
     _historyRef.onValue.listen((event) {
       final data = event.snapshot.value;
       if (data != null && data is Map) {
         final List<Map<String, dynamic>> items = [];
 
         data.forEach((key, value) {
-          if (value is Map) {
+          if (value is Map && value['userId'] == currentUserId) {
             items.add(Map<String, dynamic>.from(value));
           }
         });
@@ -47,6 +53,7 @@ class _UserHistoryPageState extends State<UserHistoryPage> {
       }
     });
   }
+
 
   int _selectedIndex = 3; // History index
 

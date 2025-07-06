@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:washywashy_laundry/cart_page.dart';
 import 'package:washywashy_laundry/home_page.dart';
@@ -17,6 +18,11 @@ class _WashPageState extends State<WashPage> {
   String? selectedWasherKg;
   String? selectedWasherPrice;
   int _selectedIndex = 0;
+
+  String generateOtp() {
+    final random = Random();
+    return '${random.nextInt(900) + 100} ${random.nextInt(900) + 100}';
+  }
 
   void _onBottomNavTapped(int index) {
     if (index == _selectedIndex) return;
@@ -127,9 +133,9 @@ class _WashPageState extends State<WashPage> {
                 children: [
                   Image.asset('assets/imgwashmacine.png', width: 45, height: 45),
                   const SizedBox(width: 10),
-                  const Text(
-                    "WASHER",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+                  Text(
+                    selectedWasherKg != null ? 'Washer: $selectedWasherKg ($selectedWasherPrice)' : 'WASHER',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
                   )
                 ],
               ),
@@ -166,8 +172,8 @@ class _WashPageState extends State<WashPage> {
                             dryer: selectedWasherKg ?? 'NONE',
                             fold: 'NONE',
                             total: selectedWasherPrice ?? 'RM 0.00',
-                            paymentMethod: 'Online Banking',
-                            otp: '',
+                            paymentMethod: 'NONE', // or whatever method is selected
+                            otp: generateOtp(), // create a method for this
                           ),
                         ),
                       );
